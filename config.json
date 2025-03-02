@@ -1,0 +1,8 @@
+{
+    "mongodb": {
+        "host": "mongodb://localhost:27017/",
+        "dbname": "translations",
+        "user": null,
+        "password": null
+    }
+}

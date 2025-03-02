@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>TranslateDB - Setup</title>
+    {% include 'lib/head.html' %}
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container-fluid position-relative p-0">
+        <!-- Spinner Start -->
+        <div id="spinner" class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
+            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+        <!-- Spinner End -->
+        <div>
+            <div class="container-fluid pt-4 px-4">
+                <div class="row vh-100 bg-secondary rounded align-items-center justify-content-center mx-0">
+                    <div class="col-md-6 text-center p-4">
+                        <i class="bi bi-exclamation-triangle display-1 text-primary"></i>
+                        <h1 class="display-1 fw-bold">SETUP YOUR DATABASE</h1>
+                        <form action="/save_config" method="post" class="mb-3">
+                            <div class="mb-3">
+                                <label for="dbType" class="form-label">Select Database Type:</label>
+                                <select class="form-select" name="dbType" id="dbType" required onchange="showDBFields(this.value)">
+                                    <option value="">Choose...</option>
+                                    <option value="MongoDB">MongoDB</option>
+                                    <option value="MySQL">MySQL</option>
+                                    <option value="PostgreSQL">PostgreSQL</option>
+                                </select>
+                            </div>
+                            <div id="dbFields"></div>
+                            <button type="submit" class="btn btn-primary rounded-pill py-3 px-5">Save Configuration</button>
+                        </form>
+                        <a class="btn btn-primary rounded-pill py-3 px-5" href="/">Go Back To Home</a>
+                    </div>
+                </div>
+            </div>
+            <!-- Footer Start -->
+            {% include 'lib/footer.html' %}
+            <!-- Footer End -->
+        </div>
+    </div>
+    <script src="/static/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function showDBFields(dbType) {
+            let html = '';
+            if (dbType === 'MongoDB') {
+                html += '<div class="mb-3"><label for="dbHost" class="form-label">Host:</label><input type="text" class="form-control" id="dbHost" name="dbHost" required></div>';
+                html += '<div class="mb-3"><label for="dbName" class="form-label">Database Name:</label><input type="text" class="form-control" id="dbName" name="dbName" required></div>';
+            } else if (dbType === 'MySQL' || dbType === 'PostgreSQL') {
+                html += '<div class="mb-3"><label for="dbHost" class="form-label">Host:</label><input type="text" class="form-control" id="dbHost" name="dbHost" required></div>';
+                html += '<div class="mb-3"><label for="dbUser" class="form-label">User:</label><input type="text" class="form-control" id="dbUser" name="dbUser" required></div>';
+                html += '<div class="mb-3"><label for="dbPassword" class="form-label">Password:</label><input type="password" class="form-control" id="dbPassword" name="dbPassword" required></div>';
+                html += '<div class="mb-3"><label for="dbName" class="form-label">Database Name:</label><input type="text" class="form-control" id="dbName" name="dbName" required></div>';
+            }
+            document.getElementById('dbFields').innerHTML = html;
+        }
+    </script>
+</body>
+</html>
