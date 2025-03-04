@@ -4,7 +4,15 @@ import json
 import os
 
 class Database:
-    def __init__(self, config_path):
+    _instance = None 
+    
+    def __new__(cls, config_path):
+        if cls._instance is None:
+            cls._instance = super(Database, cls).__new__(cls)
+            cls._instance.init_db(config_path)
+        return cls._instance
+
+    def init_db(self, config_path):
         self.config_path = config_path
         self.config = self.load_config()
         self.db = self.connect_to_db()
@@ -33,17 +41,18 @@ class Database:
         if not self.config:
             return None
         if 'mongodb' in self.config:
+            print("[INFO] Establishing a MongoDB connection...")
             return MongoClient(self.config['mongodb']['host'])[self.config['mongodb']['dbname']]
-        '''
-        elif 'mysql' in self.config:
-            return pymysql.connect(host=self.config['mysql']['host'],
-                                   user=self.config['mysql']['user'],
-                                   password=self.config['mysql']['password'],
-                                   db=self.config['mysql']['dbname'])
-        elif 'postgresql' in self.config:
-            return psycopg2.connect(host=self.config['postgresql']['host'],
-                                    user=self.config['postgresql']['user'],
-                                    password=self.config['postgresql']['password'],
-                                    dbname=self.config['postgresql']['dbname'])
-        '''
+    def get_collection(self, collection_name):
+        if self.db is not None:
+            return self.db[collection_name]
+        return None
+    def get_data(self, collection_name, query=None, projection=None):
+        if self.db is None:
+            print("[ERROR] Database connection not found!")
+            return []
+        collection = self.get_collection(collection_name)
+        if collection is not None:
+            return list(collection.find(query or {}, projection or {"_id": 0}))
+        return []
 

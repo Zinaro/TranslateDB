@@ -1,72 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
+{% include 'lib/header.html' %}
 
-<head>
-    <meta charset="utf-8">
-    <title>TranslateDB - Bootstrap 5 Admin Template</title>
-    {% include 'lib/head.html' %}
-</head>
-
-<body>
-    <div class="container-fluid position-relative d-flex p-0">
-        <!-- Spinner Start -->
-        <div id="spinner"
-            class="show bg-dark position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
-            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="sr-only">Loading...</span>
+            <div class="col-sm-12 p-4">
+                <div class="bg-secondary rounded h-100 p-4">
+                    <h6 class="mb-4">Translations</h6>
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">Original</th>
+                                <th scope="col">Translation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in translations[:10] %}
+                            <tr>
+                                <td>{{ item.original }}</td>
+                                <td>{{ item.translation }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
-        <!-- Spinner End -->
+            
 
-
-        <!-- Sidebar Start -->
-        {% include 'lib/sidebar.html' %}
-        <!-- Sidebar End -->
-
-
-        <!-- Content Start -->
-        <div class="content">
-            <!-- Navbar Start -->
-            {% include 'lib/navbar.html' %}
-            <!-- Navbar End -->
 
 
             <!-- Sale & Revenue Start -->
-            <div class="container-fluid pt-4 px-4">
+            <div class="container-fluid px-4">
                 <div class="row g-4">
                     <div class="col-sm-6 col-xl-3">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                            <i class="fa fa-chart-line fa-3x text-primary"></i>
+                            <i class="material-icons fa-3x text-primary">translate</i>
                             <div class="ms-3">
-                                <p class="mb-2">Today Sale</p>
-                                <h6 class="mb-0">$1234</h6>
+                                <p class="mb-2">Total Translations</p>
+                                <h6 class="mb-0">{{ total_translations }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-secondary rounded d-flex align-items-center justify-content-flex-start p-4">
+                            <i class="fa fa-database fa-3x text-primary"></i>
+                            <div class="ms-3">
+                                <p class="mb-2">Database</p>
+                                <h6 class="mb-0">{{ db_name }}</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6 col-xl-3">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                            <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                            <i class="fa fa-server fa-3x text-primary"></i>
                             <div class="ms-3">
-                                <p class="mb-2">Total Sale</p>
-                                <h6 class="mb-0">$1234</h6>
+                                <p class="mb-2">Database Name</p>
+                                <h6 class="mb-0">{{ database_name }}</h6>
                             </div>
                         </div>
                     </div>
                     <div class="col-sm-6 col-xl-3">
                         <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                            <i class="fa fa-chart-area fa-3x text-primary"></i>
+                            <i class="fa fa-folder fa-3x text-primary"></i>
                             <div class="ms-3">
-                                <p class="mb-2">Today Revenue</p>
-                                <h6 class="mb-0">$1234</h6>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-xl-3">
-                        <div class="bg-secondary rounded d-flex align-items-center justify-content-between p-4">
-                            <i class="fa fa-chart-pie fa-3x text-primary"></i>
-                            <div class="ms-3">
-                                <p class="mb-2">Total Revenue</p>
-                                <h6 class="mb-0">$1234</h6>
+                                <p class="mb-2">Collection Name</p>
+                                <h6 class="mb-0">{{ collection_name }}</h6>
                             </div>
                         </div>
                     </div>
