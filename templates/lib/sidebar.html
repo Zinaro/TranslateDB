@@ -20,18 +20,15 @@
                     class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
             <a href="/work" class="nav-item nav-link {% if request.path == '/work' %}active{% endif %}"><i
                     class="fa fa-terminal me-2"></i>Work</a>
-            <a href="/translations"
-                class="nav-item nav-link {% if request.path.startswith('/translations') %}active{% endif %}">
-                <i class="fa fa-book me-2"></i>Translations
-            </a>
-
-            <a href="/manage" class="nav-item nav-link {% if request.path.startswith('/manage') %}active{% endif %}">
-                <i class="fa fa-pencil-alt me-2"></i>Manage
-            </a>
-
-            <a href="/data" class="nav-item nav-link {% if request.path.startswith('/data') %}active{% endif %}">
-                <i class="fa fa-file-import me-2"></i>Data
-            </a>
+                    <div class="nav-item dropdown {% if request.path.startswith('/translations') %}show{% endif %}">
+                        <a href="#" class="nav-link dropdown-toggle {% if request.path.startswith('/translations') %}active{% endif %}" data-bs-toggle="dropdown">
+                            <i class="fa fa-language me-2"></i>Translations
+                        </a>
+                        <div class="dropdown-menu bg-transparent border-0 {% if request.path.startswith('/translations') %}show{% endif %}">
+                            <a href="/translations" class="dropdown-item {% if request.path == '/translations' %}active{% endif %}">All Translations</a>
+                            <a href="/translations/add" class="dropdown-item {% if request.path == '/translations/add' %}active{% endif %}">Add Translation</a>
+                        </div>
+                    </div>
             <a href="/widget" class="nav-item nav-link {% if request.path == '/widget' %}active{% endif %}"><i
                     class="fa fa-th me-2"></i>Widgets</a>
             <a href="/form" class="nav-item nav-link {% if request.path == '/form' %}active{% endif %}"><i

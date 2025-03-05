@@ -1,26 +1,18 @@
+# views.py
 import cherrypy
 from jinja2 import Environment, FileSystemLoader
 from db import Database
 import os
+from utils import update_jinja_globals, env, database
 
+from routes.translations import Translations
 
-env = Environment(loader=FileSystemLoader('templates'), auto_reload=True)
-config_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.json')
-database = Database(config_path)
-def update_jinja_globals():
-    print('xebiti')
-    env.globals['request'] = {
-        "path": cherrypy.request.path_info,
-        "full_url": cherrypy.url(),
-        "method": cherrypy.request.method,
-        "query_string": cherrypy.request.query_string
-    }
 cherrypy.tools.update_jinja = cherrypy.Tool('before_request_body', update_jinja_globals)
-
 
 class MyWebApp:
     def __init__(self):
         self.database = database
+        self.translations = Translations()
 
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
@@ -55,23 +47,6 @@ class MyWebApp:
     def work(self):
         template = env.get_template('work.html')
         return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def translations(self):
-        template = env.get_template('translations.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def manage(self):
-        template = env.get_template('manage.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def data(self):
-        template = env.get_template('data.html')
-        return template.render()
-
-
 
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
@@ -133,4 +108,5 @@ class MyWebApp:
         cherrypy.response.headers['Content-Type'] = 'text/html; charset=utf-8'
         template = env.get_template('404.html')
         return template.render()
+
 
