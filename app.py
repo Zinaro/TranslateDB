@@ -4,6 +4,7 @@ import os
 # #eb1616
 # #278e43
 
+from routes.data import ImportExport
 from routes.translations import Translations
 from views import MyWebApp
 
@@ -31,3 +32,5 @@ if __name__ == '__main__':
     }
     cherrypy.engine.subscribe('start', load_data_on_start)
     cherrypy.quickstart(app, '/', config)
+    cherrypy.tree.mount(ImportExport(), '/data')
+

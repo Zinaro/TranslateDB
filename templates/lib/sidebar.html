@@ -20,55 +20,27 @@
                     class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
             <a href="/work" class="nav-item nav-link {% if request.path == '/work' %}active{% endif %}"><i
                     class="fa fa-terminal me-2"></i>Work</a>
-                    <div class="nav-item dropdown {% if request.path.startswith('/translations') %}show{% endif %}">
-                        <a href="#" class="nav-link dropdown-toggle {% if request.path.startswith('/translations') %}active{% endif %}" data-bs-toggle="dropdown">
-                            <i class="fa fa-language me-2"></i>Translations
-                        </a>
-                        <div class="dropdown-menu bg-transparent border-0 {% if request.path.startswith('/translations') %}show{% endif %}">
-                            <a href="/translations" class="dropdown-item {% if request.path == '/translations' %}active{% endif %}">All Translations</a>
-                            <a href="/translations/add" class="dropdown-item {% if request.path == '/translations/add' %}active{% endif %}">Add Translation</a>
-                        </div>
-                    </div>
-            <a href="/widget" class="nav-item nav-link {% if request.path == '/widget' %}active{% endif %}"><i
-                    class="fa fa-th me-2"></i>Widgets</a>
-            <a href="/form" class="nav-item nav-link {% if request.path == '/form' %}active{% endif %}"><i
-                    class="fa fa-keyboard me-2"></i>Forms</a>
-            <a href="/table" class="nav-item nav-link {% if request.path == '/table' %}active{% endif %}"><i
-                    class="fa fa-table me-2"></i>Tables</a>
-            <a href="/chart" class="nav-item nav-link {% if request.path == '/chart' %}active{% endif %}"><i
-                    class="fa fa-chart-bar me-2"></i>Charts</a>
-            <div class="nav-item dropdown">
+            <div class="nav-item dropdown {% if request.path.startswith('/translations') %}show{% endif %}">
                 <a href="#"
-                    class="nav-link dropdown-toggle {% if request.path in ['/signin', '/signup', '/err404', '/blank'] %}active{% endif %}"
+                    class="nav-link dropdown-toggle {% if request.path.startswith('/translations') %}active{% endif %}"
                     data-bs-toggle="dropdown">
-                    <i class="far fa-file-alt me-2"></i>Pages
+                    <i class="fa fa-language me-2"></i>Translations
                 </a>
-                <div class="dropdown-menu bg-transparent border-0">
-                    <a href="/signin" class="dropdown-item {% if request.path == '/signin' %}active{% endif %}">Sign
-                        In</a>
-                    <a href="/signup" class="dropdown-item {% if request.path == '/signup' %}active{% endif %}">Sign
-                        Up</a>
-                    <a href="/err404" class="dropdown-item {% if request.path == '/err404' %}active{% endif %}">404
-                        Error</a>
-                    <a href="/blank" class="dropdown-item {% if request.path == '/blank' %}active{% endif %}">Blank
-                        Page</a>
+                <div
+                    class="dropdown-menu bg-transparent border-0 {% if request.path.startswith('/translations') %}show{% endif %}">
+                    <a href="/translations"
+                        class="dropdown-item {% if request.path == '/translations' %}active{% endif %}">All
+                        Translations</a>
+                    <a href="/translations/untranslated"
+                        class="dropdown-item {% if request.path == '/translations/untranslated' %}active{% endif %}">Untranslated</a>
+                    <a href="/translations/add"
+                        class="dropdown-item {% if request.path == '/translations/add' %}active{% endif %}">Add
+                        Translation</a>
                 </div>
             </div>
-            <div class="nav-item dropdown">
-                <a href="#"
-                    class="nav-link dropdown-toggle {% if request.path in ['/button', '/typography', '/element'] %}active{% endif %}"
-                    data-bs-toggle="dropdown">
-                    <i class="fa fa-laptop me-2"></i>Elements
-                </a>
-                <div class="dropdown-menu bg-transparent border-0">
-                    <a href="/button"
-                        class="dropdown-item {% if request.path == '/button' %}active{% endif %}">Buttons</a>
-                    <a href="/typography"
-                        class="dropdown-item {% if request.path == '/typography' %}active{% endif %}">Typography</a>
-                    <a href="/element" class="dropdown-item {% if request.path == '/element' %}active{% endif %}">Other
-                        Elements</a>
-                </div>
-            </div>
+            <a href="/data" class="nav-item nav-link {% if request.path.startswith('/data') %}active{% endif %}">
+                <i class="fa fa-file-import me-2"></i>Data
+            </a>
         </div>
     </nav>
 </div>

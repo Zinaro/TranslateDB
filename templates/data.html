@@ -1,0 +1,117 @@
+{% include 'lib/header.html' %}
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <!-- Import Section -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Import</h6>
+                <form action="/data/import_data" method="post" enctype="multipart/form-data" id="import-form">
+                    <div class="mb-3">
+                        <label for="formFile" class="form-label">Upload File</label>
+                        <input class="form-control" type="file" id="formFile" name="import_file" accept=".json,.txt,.csv,.po" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </form>
+                <hr class="my-3">
+                <div id="import-alert" class="alert d-none mt-3"></div>
+            </div>
+        </div>
+        
+        <!-- Export Section -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Export</h6>
+                <p>Click the button below to download the exported file.</p>
+                <form action="/data/export" method="get">
+                    <button type="submit" class="btn btn-success">Export</button>
+                </form>
+                <hr class="my-3">
+            </div>
+        </div>
+        <!-- Delete Section -->
+        <div class="col-sm-12 col-xl-6">
+            <div class="bg-secondary rounded h-100 p-4">
+                <h6 class="mb-4">Delete</h6>
+                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                    Clear Database
+                </button>
+                <hr class="my-3">
+                <div id="delete-alert" class="alert d-none mt-3"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-secondary text-light rounded">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete all translations? This action cannot be undone.
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete All</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("confirm-delete-btn")?.removeEventListener('click', confirmDeleteHandler);
+function confirmDeleteHandler() {
+    fetch("/data/delete_all", { method: "POST" })
+            .then(response => response.json())
+            .then(data => {
+                const alertBox = document.getElementById("delete-alert");
+                alertBox.classList.remove('d-none', 'alert-success', 'alert-danger');
+                if (data.success) {
+                    alertBox.classList.add('alert-success');
+                    alertBox.textContent = data.message || "All translations have been deleted.";
+                } else {
+                    alertBox.classList.add('alert-danger');
+                    alertBox.textContent = data.error || "Failed to delete translations.";
+                }
+            })
+            .catch(error => {
+                const alertBox = document.getElementById("delete-alert");
+                alertBox.classList.remove('d-none', 'alert-success');
+                alertBox.classList.add('alert-danger');
+                alertBox.textContent = "Error during deletion: " + error;
+            })
+            .finally(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+                modal.hide();
+            });
+}
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector("#confirmDeleteModal .btn-danger").addEventListener("click", confirmDeleteHandler);
+
+    document.getElementById("import-alert")?.classList.add('d-none');
+    document.getElementById("import-alert")?.classList.remove('alert-success', 'alert-danger');
+    document.querySelector("form[action='/data/import_data']")?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let formData = new FormData(this);
+
+        fetch('/data/import_data', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                let alertBox = document.getElementById("import-alert");
+                alertBox.classList.remove('d-none');
+                if (data.success) {
+                    alertBox.classList.add('alert-success');
+                    alertBox.textContent = data.message;
+                } else {
+                    alertBox.classList.add('alert-danger');
+                    alertBox.textContent = data.error || "Import failed.";
+                }
+            })  
+            .catch(error => console.error('Unexpected error:', error));
+        });
+})
+</script>
+{% include 'lib/footer.html' %}

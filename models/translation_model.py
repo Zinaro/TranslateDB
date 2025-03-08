@@ -8,6 +8,28 @@ class TranslationModel:
     def __init__(self):
         self.collection = database.get_collection('translations')
 
+    @staticmethod
+    def insert_or_update_translation(data):
+        translation_model.collection.update_one(
+            {"_id": data["_id"]},
+            {"$set": data},
+            upsert=True
+        )
+    @staticmethod
+    def insert_translation(data):
+        translation_model.collection.insert_one(data)
+    
+    @staticmethod
+    def delete_all_translations():
+        translation_model.collection.delete_many({})
+
+    @staticmethod
+    def get_existing_translations_by_english(english_words):
+        existing = translation_model.collection.find({"english": {"$in": english_words}}, {"english": 1})
+        return set(item["english"] for item in existing)
+
+
+
     def add_translation(self, english, kurdish):
         try:
             result = self.collection.insert_one({"english": english, "kurdish": kurdish})

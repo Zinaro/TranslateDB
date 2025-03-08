@@ -2,6 +2,7 @@
 import json
 import cherrypy
 from models.translation_model import translation_model
+from routes.untranslated import Untranslated
 from utils import update_jinja_globals, env, database
 
 cherrypy.tools.update_jinja = cherrypy.Tool('before_request_body', update_jinja_globals)
@@ -10,6 +11,9 @@ translations_cache = []
 class Translations:
     def __init__(self):
         self.database = database
+        self.untranslated = Untranslated()
+        self.load_translations()
+
 
     @classmethod
     def load_translations(cls):
@@ -30,7 +34,6 @@ class Translations:
             for item in translations_cache
         ])
 
-   
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
     def add(self, english=None, kurdish=None):
@@ -78,15 +81,19 @@ class Translations:
     def search(self, query=None):
         print(f"[INFO] Search query: {query}", len(query))
         if not query:
-            return json.dumps([])
+            return json.dumps(translations_cache)
         query = query.lower()
         results = [
             {"_id": str(t["_id"]), "english": t["english"], "kurdish": t["kurdish"]}
-            for t in translation_model.get_all_translations()
+            for t in translations_cache
             if query in t["english"].lower() or query in t["kurdish"].lower()
         ]
-        if len(query) == 0 or query == '':
-            results = translation_model.get_all_translations()
-        return json.dumps(results)
+        results_sorted = sorted(results, key=lambda x: len(x["english"]))
+        return json.dumps(results_sorted)
+    
+    @cherrypy.expose
+    def refresh(self):
+        self.load_translations()
+        return
     
     

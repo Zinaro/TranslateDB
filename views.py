@@ -1,11 +1,10 @@
 # views.py
 import cherrypy
-from jinja2 import Environment, FileSystemLoader
-from db import Database
-import os
+from routes.data import ImportExport
+from routes.translations import Translations
+from routes.work import Work
 from utils import update_jinja_globals, env, database
 
-from routes.translations import Translations
 
 cherrypy.tools.update_jinja = cherrypy.Tool('before_request_body', update_jinja_globals)
 
@@ -13,6 +12,9 @@ class MyWebApp:
     def __init__(self):
         self.database = database
         self.translations = Translations()
+        self.data = ImportExport()
+        self.work = Work()
+
 
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
@@ -41,12 +43,6 @@ class MyWebApp:
     def save_config(self, dbType, dbHost, dbName, dbUser=None, dbPassword=None):
         database.save_config(dbType, dbHost, dbName, dbUser, dbPassword)
         raise cherrypy.HTTPRedirect("/")
-    
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def work(self):
-        template = env.get_template('work.html')
-        return template.render()
 
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
