@@ -17,7 +17,7 @@ class Untranslated:
     @classmethod
     def load_untranslated(cls):
         global untranslated_cache
-        print('xebit;;;;;')
+
         untranslated_cache = untranslated_model.get_all_translations()
         print(f"[INFO] Cached {len(untranslated_cache)} untranslated entries.")
 
@@ -25,6 +25,7 @@ class Untranslated:
     @cherrypy.tools.update_jinja()
     def index(self):
         untranslated = untranslated_model.get_all_translations()
+        self.load_untranslated()
         template = env.get_template('translate/untranslated.html')
         return template.render(untranslated=untranslated)
 

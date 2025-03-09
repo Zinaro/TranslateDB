@@ -25,6 +25,7 @@ class Translations:
     @cherrypy.tools.update_jinja()
     def index(self):
         translations = translation_model.get_all_translations()
+        self.load_translations()
         template = env.get_template('translate/translations.html')
         return template.render( translations=translations)
     @cherrypy.expose

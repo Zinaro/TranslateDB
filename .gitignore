@@ -1,4 +1,9 @@
 darkpan-1.0.0.zip
 /darkpan-1.0.0
 /__pycache__
+/models/__pycache__
+/routes/__pycache__
 
+/templates/delete
+
+/uploads
