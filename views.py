@@ -46,31 +46,6 @@ class MyWebApp:
 
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
-    def blank(self):
-        template = env.get_template('blank.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def button(self):
-        template = env.get_template('button.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def chart(self):
-        template = env.get_template('chart.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def element(self):
-        template = env.get_template('element.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def form(self):
-        template = env.get_template('form.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
     def signin(self):
         template = env.get_template('signin.html')
         return template.render()
@@ -78,21 +53,6 @@ class MyWebApp:
     @cherrypy.tools.update_jinja()
     def signup(self):
         template = env.get_template('signup.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def table(self):
-        template = env.get_template('table.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def typography(self):
-        template = env.get_template('typography.html')
-        return template.render()
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def widget(self):
-        template = env.get_template('widget.html')
         return template.render()
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
