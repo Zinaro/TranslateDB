@@ -1,9 +1,21 @@
 /********** Template CSS **********/
 :root {
-    --primary: #eb1616;
+    --primary: #278e43;
     --secondary: #191C24;
     --light: #6C7293;
     --dark: #000000;
+}
+
+.theme-green {
+    --primary: #278e43;
+}
+
+.theme-red {
+    --primary: #eb1616;
+}
+
+.theme-yellow {
+    --primary: #febd00;
 }
 
 .back-to-top {

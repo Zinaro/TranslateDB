@@ -35,6 +35,15 @@ check_docker() {
         echo "[INFO] Docker is already installed."
     fi
 }
+check_docker_service() {
+    if ! systemctl is-active --quiet docker; then
+        echo "[INFO] Docker service is not running. Starting and enabling..."
+        sudo systemctl start docker
+        sudo systemctl enable docker
+    else
+        echo "[INFO] Docker service is already active."
+    fi
+}
 
 check_mongodb_container() {
     if sudo docker inspect mongodb1 &>/dev/null; then
@@ -66,5 +75,6 @@ verify_mongodb() {
 }
 
 check_docker
+check_docker_service
 check_mongodb_container
 verify_mongodb

@@ -28,12 +28,24 @@ function updatePagination() {
     paginationBottom.innerHTML = "";
     if (totalPages <= 1) return;
     let paginationHTML = "";
-
-    for (let i = 1; i <= totalPages; i++) {
+    if (currentPage !== 1) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(1)">1</a></li>`;
+    }
+    if (currentPage > 3) {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+    for (let i = Math.max(2, currentPage - 2); i <= Math.min(totalPages - 1, currentPage + 2); i++) {
         paginationHTML += `<li class="page-item ${i === currentPage ? 'active' : ''}">
             <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
         </li>`;
     }
+    if (currentPage < totalPages - 2) {
+        paginationHTML += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+    }
+    if (currentPage !== totalPages) {
+        paginationHTML += `<li class="page-item"><a class="page-link" href="#" onclick="changePage(${totalPages})">${totalPages}</a></li>`;
+    }
+
     paginationTop.innerHTML = paginationHTML;
     paginationBottom.innerHTML = paginationHTML;
 }
