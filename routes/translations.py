@@ -2,6 +2,7 @@
 import json
 import cherrypy
 from models.translation_model import translation_model
+from models.untranslated_model import untranslated_model
 from routes.untranslated import Untranslated
 from utils import update_jinja_globals, env, database
 
@@ -35,17 +36,6 @@ class Translations:
             for item in translations_cache
         ])
 
-    @cherrypy.expose
-    @cherrypy.tools.update_jinja()
-    def add(self, english=None, kurdish=None):
-        if cherrypy.request.method == "POST":
-            if english and kurdish:
-                translation_model.add_translation(english, kurdish)
-                self.load_translations()
-                return self.render_add_page("Translation added successfully!")
-            else:
-                return self.render_add_page("Please fill in both fields.")
-        return self.render_add_page()
     
     @cherrypy.expose
     @cherrypy.tools.json_out()
@@ -53,10 +43,16 @@ class Translations:
     def update(self):
         data = cherrypy.request.json
         if "id" in data and "english" in data and "kurdish" in data:
-            success = translation_model.update_translation(data["id"], data["english"], data["kurdish"])
-            if success:
+            if not data["kurdish"].strip():
+                translation_model.delete_translation(data["id"])
+                untranslated_model.insert_translation({"id": data["id"], "english": data["english"]})
                 self.load_translations()
-            return {"success": success}
+                return {"success": True}
+            else:
+                success = translation_model.update_translation(data["id"], data["english"], data["kurdish"])
+                if success:
+                    self.load_translations()
+                return {"success": success}
         return {"success": False, "error": "Missing parameters"}
 
     @cherrypy.expose
@@ -70,13 +66,30 @@ class Translations:
                 self.load_translations() 
             return {"success": success}
         return {"success": False, "error": "Missing parameters"}
-
-
     
     @cherrypy.expose
     @cherrypy.tools.update_jinja()
-    def render_add_page(self, success_message=None):
-        return env.get_template("translate/add.html").render(success_message=success_message)
+    def add(self, english=None, kurdish=None):
+        success_message = None
+        success = None
+        if cherrypy.request.method == "POST":
+            if english and kurdish:
+                existing = translation_model.get_existing_translations_by_english([english])
+                if english in existing:
+                    success_message = "This translation already exists!"
+                    success = False
+                else:
+                    translation_model.add_translation(english, kurdish)
+                    self.load_translations()
+                    success_message = "Translation added successfully!"
+                    success = True
+            else:
+                success_message = "Please fill in both fields."
+                success = False
+        return env.get_template("translate/add.html").render(
+            success_message=success_message,
+            success=success
+        )
     
     @cherrypy.expose
     def search(self, query=None):

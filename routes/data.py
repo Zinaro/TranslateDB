@@ -45,7 +45,7 @@ class ImportExport:
         try:
             uploaded_content = import_file.file.read().decode('utf-8')
             translations, untranslated = [], []
-
+            seen_english = set()
             try:
                 data = json.loads(uploaded_content)
                 if not isinstance(data, list):
@@ -53,9 +53,12 @@ class ImportExport:
                 for item in data:
                     english = item.get("english", "").strip()
                     kurdish = item.get("kurdish", "").strip()
-                    if english and kurdish:
+                    if not english or english in seen_english:
+                        continue
+                    seen_english.add(english)
+                    if kurdish:
                         translations.append({"english": english, "kurdish": kurdish})
-                    elif english and not kurdish:
+                    else:
                         untranslated_model.insert_translation({"english": english, "kurdish": ""})
 
             except json.JSONDecodeError:
@@ -70,13 +73,18 @@ class ImportExport:
 
                     if line.startswith('msgid'):
                         current_english = line[len('msgid'):].strip().strip('\"')
+                        if not current_english or current_english in seen_english:
+                            current_english = None
+                        else:
+                            seen_english.add(current_english)
                     elif line.startswith('msgstr'):
+                        if current_english is None:
+                            continue
                         current_kurdish = line[len('msgstr'):].strip().strip('"')
-                        if current_english:
-                            if current_kurdish:
-                                translations.append({"english": current_english, "kurdish": current_kurdish})
-                            else:
-                                untranslated_model.insert_translation({"english": current_english, "kurdish": ""})
+                        if current_kurdish:
+                            translations.append({"english": current_english, "kurdish": current_kurdish})
+                        else:
+                            untranslated_model.insert_translation({"english": current_english, "kurdish": ""})
                         current_kurdish = current_english = None
                     elif any(separator in line for separator in [":", "=", ","]):
                         separator_used = next((sep for sep in [":", "=", ","] if sep in line), None)
@@ -85,13 +93,18 @@ class ImportExport:
                         value = value.strip()
 
                         if key in ["en", "english", "msgid"]:
-                            current_english = value
+                            if value and value not in seen_english:
+                                current_english = value
+                                seen_english.add(value)
+                            else:
+                                current_english = None
                         elif key in ["ku", "kurdish", "msgstr"]:
-                            if current_english:
-                                if value:
-                                    translations.append({"english": current_english, "kurdish": value})
-                                else:
-                                    untranslated_model.insert_translation({"english": current_english, "kurdish": ""})
+                            if current_english is None:
+                                continue
+                            if value:
+                                translations.append({"english": current_english, "kurdish": value})
+                            else:
+                                untranslated_model.insert_translation({"english": current_english, "kurdish": ""})
                             current_english = None
 
             if not translations:
@@ -137,5 +150,22 @@ class ImportExport:
             return json.dumps({
                 "success": False,
                 "error": "Failed to delete translations.",
+                "details": str(e)
+            })
+        
+    @cherrypy.expose
+    @cherrypy.tools.allow(methods=['POST'])
+    def delete_untranslated(self):
+        try:
+            untranslated_model.delete_all_translations()
+            return json.dumps({
+                "success": True,
+                "message": "All untranslated have been deleted successfully."
+            })
+        except Exception as e:
+            cherrypy.response.status = 500
+            return json.dumps({
+                "success": False,
+                "error": "Failed to delete untranslated.",
                 "details": str(e)
             })

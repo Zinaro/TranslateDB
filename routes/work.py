@@ -36,12 +36,15 @@ class Work:
                 f.write(data)
         if filepath.endswith(".csv"):
             result = parse_csv(filepath)
-        elif filepath.endswith(".po"):
+        elif filepath.endswith(".po") or filepath.endswith(".pot"):
             result = parse_po(filepath)
             if "translations" in result:
                 result["translations"] = self.translate_po(result["translations"])
         else:
             return {"message": "Unsupported file format!", "translations": []}
+        collection_name = "translations"
+        db_translations = self.db.get_data(collection_name, {}, {"_id": 1})
+        result["db_total_translations"] = len(db_translations)
         return result
 
     def translate_po(self, translations):

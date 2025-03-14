@@ -17,9 +17,9 @@
                 </form>
 
                 {% if success_message %}
-                <div class="alert alert-success mt-3">
-                    {{ success_message }}
-                </div>
+                    <div class="alert mt-3 {% if success %}alert-success{% else %}alert-danger{% endif %}">
+                        {{ success_message }}
+                    </div>
                 {% endif %}
             </div>
         </div>

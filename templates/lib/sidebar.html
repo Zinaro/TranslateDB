@@ -18,7 +18,7 @@
         <div class="navbar-nav w-100">
             <a href="/" class="nav-item nav-link {% if request.path == '/' %}active{% endif %}"><i
                     class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
-            <a href="/work" class="nav-item nav-link {% if request.path == '/work' %}active{% endif %}"><i
+            <a href="/work" class="nav-item nav-link {% if request.path.startswith('/work') %}active{% endif %}"><i
                     class="fa fa-terminal me-2"></i>Work</a>
             <div class="nav-item dropdown {% if request.path.startswith('/translations') %}show{% endif %}">
                 <a href="#"

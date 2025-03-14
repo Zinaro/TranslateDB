@@ -4,16 +4,17 @@ document.getElementById("allAcceptBtn").addEventListener("click", function () {
     translationsState.forEach(translation => translation.approved = true);
     updatePagination();
     updateTable();
+    updateApprovedCount();
 });
 document.getElementById("removeSelectedBtn").addEventListener("click", function () {
-    const rows = document.querySelectorAll("#translations-body tr");
-    rows.forEach((row, index) => {
-        if (translationsState[index].approved) {
-            translationsState[index].approved = false;
-            row.classList.remove("table-success");
-            row.classList.remove("table-danger");
+    translationsState.forEach(translation => {
+        if (translation.approved) {
+            translation.approved = false;
         }
     });
+    updatePagination();
+    updateTable();
+    updateApprovedCount(); 
 });
 
 function updateTable() {
@@ -29,21 +30,40 @@ function updateTable() {
         const row = document.createElement("tr");
         row.classList.toggle("table-success", translation.approved);
         row.setAttribute("data-index", globalIndex);
-        row.innerHTML = `
-    <td class="align-middle">${translation.msgid}</td>
-    <td class="align-middle">
-        <textarea class="form-control translation-input" data-index="${index}" rows="1">${translation.msgstr}</textarea>
-    </td>
-    <td class="text-center align-middle">
-        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-            <button class="btn btn-sm btn-success approve-btn">✔</button>
-            <button class="btn btn-sm btn-danger reject-btn">✖</button>
-        </div>
-    </td>
-`;
+
+        const englishCell = document.createElement("td");
+        englishCell.classList.add("align-middle");
+        const englishDiv = document.createElement("div");
+        englishDiv.classList.add("text-break", "overflow-auto");
+        englishDiv.style.maxHeight = "200px";
+        englishDiv.textContent = translation.msgid || "";
+        englishCell.appendChild(englishDiv);
+
+        const kurdishCell = document.createElement("td");
+        kurdishCell.classList.add("align-middle");
+        const textarea = document.createElement("textarea");
+        textarea.classList.add("form-control", "translation-input", "overflow-auto", "text-break");
+        textarea.setAttribute("data-index", index);
+        textarea.setAttribute("rows", "1");
+        textarea.style.maxHeight = "200px";
+        textarea.textContent = translation.msgstr || "";
+        kurdishCell.appendChild(textarea);
+
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("text-center", "align-middle");
+        actionsCell.innerHTML = `
+            <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                <button class="btn btn-sm btn-success approve-btn">✔</button>
+                <button class="btn btn-sm btn-danger reject-btn">✖</button>
+            </div>
+        `;
+
+        row.appendChild(englishCell);
+        row.appendChild(kurdishCell);
+        row.appendChild(actionsCell);
+
         tbody.appendChild(row);
     });
-
 
     setupRowActions();
     document.getElementById("exportBtn").style.display = "block";
@@ -52,8 +72,10 @@ function updateTable() {
 function updatePagination() {
     totalPages = Math.ceil(translationsState.length / rowsPerPage);
     const paginationTop = document.getElementById("pagination-top");
+    const paginationBottom = document.getElementById("pagination-bottom")
 
     paginationTop.innerHTML = "";
+    paginationBottom.innerHTML = "";
     if (totalPages <= 1) return;
 
     let paginationHTML = "";
@@ -77,6 +99,7 @@ function updatePagination() {
     }
 
     paginationTop.innerHTML = paginationHTML;
+    paginationBottom.innerHTML = paginationHTML;
 }
 
 function changePage(page) {
@@ -96,8 +119,10 @@ document.getElementById("uploadBtn").addEventListener("click", function () {
     const fileInput = document.getElementById("fileInput");
     const uploadStatus = document.getElementById("uploadStatus");
     const translationsContainer = document.getElementById("translations-container");
+    const summaryContainer = document.getElementById("summary-container");
     uploadStatus.innerHTML = "";
     translationsContainer.style.display = "none";
+    summaryContainer.style.display = "none";
 
     if (fileInput.files.length === 0) {
         showMessage("Please select a file!", "danger");
@@ -115,10 +140,19 @@ document.getElementById("uploadBtn").addEventListener("click", function () {
         .then(data => {
             console.log("Server Response:", data);
             showMessage(data.message, "success");
-
             if (data.translations.length > 0) {
+                document.getElementById("databaseTranslations").textContent = data.db_total_translations || 0;
+            }
+            if (data.translations && data.translations.length > 0) {
                 translationsContainer.style.display = "block";
+                summaryContainer.style.display = "block";
                 loadTranslations(data.translations);
+                const totalTranslations = data.translations.length;
+                const matchedTranslations = data.translations.filter(t => t.msgstr && t.msgstr.trim() !== "").length;
+                const approvedTranslations = data.translations.filter(t => t.approved).length;
+                document.getElementById("totalTranslations").textContent = totalTranslations;
+                document.getElementById("matchedTranslations").textContent = matchedTranslations;
+                document.getElementById("approvedTranslations").textContent = approvedTranslations;
                 document.getElementById("uploadForm").reset();
             }
         })
@@ -153,8 +187,13 @@ function loadTranslations(translations) {
 
     updatePagination();
     updateTable();
+    updateApprovedCount();
 }
 
+function updateApprovedCount() {
+    const approvedCount = translationsState.filter(t => t.approved).length;
+    document.getElementById("approvedTranslations").textContent = approvedCount;
+}
 
 
 function setupRowActions() {
@@ -166,6 +205,7 @@ function setupRowActions() {
 
             const index = parseInt(row.getAttribute("data-index"));
             translationsState[index].approved = true;
+            updateApprovedCount();
         });
     });
 
@@ -177,6 +217,13 @@ function setupRowActions() {
 
             const index = parseInt(row.getAttribute("data-index"));
             translationsState[index].approved = false;
+            updateApprovedCount();
+        });
+    });
+    document.querySelectorAll(".translation-input").forEach(textarea => {
+        textarea.addEventListener("input", function () {
+            const index = parseInt(this.closest("tr").getAttribute("data-index"));
+            translationsState[index].msgstr = this.value;
         });
     });
 }
@@ -185,32 +232,21 @@ function setupRowActions() {
 document.getElementById("exportBtn").addEventListener("click", exportTranslations);
 
 function exportTranslations() {
-    const rows = document.querySelectorAll("#translations-body tr");
-    const updatedTranslations = [];
-
-    rows.forEach(row => {
-        const msgid = row.children[0].textContent.trim();
-        const msgstr = row.children[1].querySelector("textarea").value.trim();
-        const approved = row.classList.contains("table-success");
-
-        updatedTranslations.push({ msgid, msgstr, approved });
-    });
-
     fetch("/work/save_and_export", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ translations: updatedTranslations })
+        body: JSON.stringify({ translations: translationsState })
     })
-        .then(response => response.json())
-        .then(data => {
-            if (data.download_url) {
-                console.log("Downloading file:", data.download_url);
-                window.location.href = data.download_url;
-            } else {
-                alert("Error: " + (data.error || "Could not export file."));
-            }
-        })
-        .catch(error => {
-            alert("Error exporting file: " + error.message);
-        });
+    .then(response => response.json())
+    .then(data => {
+        if (data.download_url) {
+            console.log("Downloading file:", data.download_url);
+            window.location.href = data.download_url;
+        } else {
+            alert("Error: " + (data.error || "Could not export file."));
+        }
+    })
+    .catch(error => {
+        alert("Error exporting file: " + error.message);
+    });
 }

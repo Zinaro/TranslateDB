@@ -46,26 +46,54 @@ function changePage(page) {
 }
 
 function updateTable() {
-    let tbody = document.getElementById("untranslated-body");
+    const tbody = document.getElementById("untranslated-body");
     tbody.innerHTML = "";
-    let start = (currentPage - 1) * rowsPerPage, end = start + rowsPerPage;
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
     untranslatedState.slice(start, end).forEach(item => {
-        tbody.innerHTML += `<tr data-id="${item._id}">
-            <td>${item.english}</td>
-            <td>${item.kurdish || "—"}</td>
-            <td class="text-center">
-                <button class="btn btn-sm btn-outline-warning edit-btn"
-                    data-id="${item._id}" 
-                    data-english="${item.english}" 
-                    data-kurdish="${item.kurdish}"
-                    data-bs-toggle="modal"
-                    data-bs-target="#editModal">
-                    ✎
-                </button>
-                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${item._id}">🗑</button>
-            </td>
-        </tr>`;
+        const row = document.createElement("tr");
+        row.setAttribute("data-id", item._id);
+
+        const englishCell = document.createElement("td");
+        const englishDiv = document.createElement("div");
+        englishDiv.classList.add("text-break", "overflow-auto");
+        englishDiv.style.maxHeight = "120px";
+        englishDiv.textContent = item.english || "—";
+        englishCell.appendChild(englishDiv);
+
+        const kurdishCell = document.createElement("td");
+        const kurdishDiv = document.createElement("div");
+        kurdishDiv.classList.add("text-break", "overflow-auto");
+        kurdishDiv.style.maxHeight = "120px";
+        kurdishDiv.textContent = item.kurdish || "—";
+        kurdishCell.appendChild(kurdishDiv);
+
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("text-center");
+
+        const editButton = document.createElement("button");
+        editButton.classList.add("btn", "btn-sm", "btn-outline-warning", "edit-btn", "mx-1");
+        editButton.setAttribute("data-id", item._id);
+        editButton.setAttribute("data-english", item.english || "");
+        editButton.setAttribute("data-kurdish", item.kurdish || "");
+        editButton.setAttribute("data-bs-toggle", "modal");
+        editButton.setAttribute("data-bs-target", "#editModal");
+        editButton.textContent = "✎";
+
+        const deleteButton = document.createElement("button");
+        deleteButton.classList.add("btn", "btn-sm", "btn-outline-danger", "delete-btn", "mx-1");
+        deleteButton.setAttribute("data-id", item._id);
+        deleteButton.textContent = "🗑";
+
+        actionsCell.appendChild(editButton);
+        actionsCell.appendChild(deleteButton);
+
+        row.appendChild(englishCell);
+        row.appendChild(kurdishCell);
+        row.appendChild(actionsCell);
+
+        tbody.appendChild(row);
     });
 
     bindEditButtons();
@@ -76,8 +104,8 @@ function bindEditButtons() {
     document.querySelectorAll(".edit-btn").forEach(button => {
         button.onclick = function () {
             document.getElementById("edit-id").value = button.getAttribute("data-id");
-            document.getElementById("edit-english").value = button.getAttribute("data-english");
-            document.getElementById("edit-kurdish").value = button.getAttribute("data-kurdish") || '';
+            document.getElementById("edit-english").value = button.getAttribute("data-english") || "";
+            document.getElementById("edit-kurdish").value = button.getAttribute("data-kurdish") || "";
         };
     });
 }
@@ -90,7 +118,7 @@ function bindDeleteButtons() {
             fetch("/translations/untranslated/delete", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id: id })
+                body: JSON.stringify({ id: String(id) })
             }).then(response => response.json())
                 .then(data => {
                     if (data.success) {
