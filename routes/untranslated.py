@@ -32,7 +32,12 @@ class Untranslated:
     @cherrypy.expose
     def all(self):
         return json.dumps([
-            {"_id": str(item["_id"]), "english": item["english"], "kurdish": item["kurdish"]}
+            {
+                "_id": str(item["_id"]),
+                "english": item["english"],
+                "kurdish": item.get("kurdish", ""),
+                "googletrans": item.get("googletrans", "")
+            }
             for item in untranslated_cache
         ])
 
@@ -80,3 +85,25 @@ class Untranslated:
     def refresh(self):
         self.load_untranslated()
         return
+    
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    @cherrypy.tools.json_in()
+    def google_translate(self):
+        data = cherrypy.request.json
+        if "id" in data and "english" in data:
+            try:
+                from services.google_translation_service import GoogleTranslationService
+                translator = GoogleTranslationService()
+                kurdish_translation = translator.translate_text(data["english"])
+
+                if kurdish_translation: 
+                    untranslated_model.update_translation(data["id"], data["english"], "", kurdish_translation)
+                    self.load_untranslated()
+                    return {"success": True, "googletrans": kurdish_translation}
+                return {"success": False, "error": "Translation failed"}
+
+            except Exception as e:
+                return {"success": False, "error": str(e)}
+        return {"success": False, "error": "Missing parameters"}
+

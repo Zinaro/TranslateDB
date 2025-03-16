@@ -18,10 +18,11 @@
         <!-- Untranslated Table -->
         <div class="col-sm-12">
             <div class="bg-secondary rounded h-100 p-4">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-4">Untranslated Entries</h6>
-                    <div class="d-flex">
-                        <select id="rows-per-page" class="form-select form-select-sm me-2">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h6 class="mb-0">Untranslated Entries</h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <button id="translate-visible-btn" class="btn btn-sm btn-primary">Translate Visible</button>
+                        <select id="rows-per-page" class="form-select w-auto">
                             <option value="10" selected>10</option>
                             <option value="20">20</option>
                             <option value="50">50</option>
@@ -33,61 +34,28 @@
                         </nav>
                     </div>
                 </div>
-                <table class="table table-hover align-middle">
-                    <thead>
-                        <tr>
-                            <th scope="col">English</th>
-                            <th scope="col">Kurdish</th>
-                            <th scope="col" class="text-center" style="width: 120px;">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="untranslated-body">
-                    </tbody>
-                </table>
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="mb-4">Untranslated Entries</h6>
-                    <div class="d-flex">
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0" id="pagination-bottom"></ul>
-                        </nav>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered table-striped align-middle">
+                        <thead>
+                            <tr>
+                                <th scope="col" style="width:42%;">English</th>
+                                <th scope="col" style="width:42%;">Kurdish</th>
+                                <th scope="col" class="text-center" style="width:16%;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="untranslated-body"></tbody>
+                    </table>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-light">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Untranslated Entry</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="edit-id">
-                <div class="mb-3">
-                    <label for="edit-english" class="form-label">English</label>
-                    <textarea class="form-control text-light bg-secondary border-0 overflow-auto text-break"
-                        id="edit-english" rows="1" style="max-height: 200px;"></textarea>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <h6 class="mb-0">Untranslated Entries</h6>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0" id="pagination-bottom"></ul>
+                    </nav>
                 </div>
-                <div class="mb-3">
-                    <label for="edit-kurdish" class="form-label">Kurdish</label>
-                    <textarea class="form-control text-light bg-secondary border-0 overflow-auto text-break"
-                        id="edit-kurdish" rows="1" style="max-height: 200px;"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-light btn-sm" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-outline-success btn-sm" data-bs-dismiss="modal"
-                    id="save-edit">Save</button>
             </div>
         </div>
     </div>
 </div>
 
 <script src="/static/js/untranslated.js"></script>
-
 {% include 'lib/footer.html' %}

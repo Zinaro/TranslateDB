@@ -22,7 +22,12 @@ class UntranslatedModel:
         try:
             results = list(self.collection.find({}))
             return [
-                {"_id": str(item["_id"]), "english": item["english"], "kurdish": item.get("kurdish", "")}
+                {
+                    "_id": str(item["_id"]),
+                    "english": item["english"],
+                    "kurdish": item.get("kurdish", ""),
+                    "googletrans": item.get("googletrans", "")
+                }
                 for item in results
             ]
         except Exception as e:
@@ -53,12 +58,16 @@ class UntranslatedModel:
             print(f"[ERROR] delete_translation failed: {e}")
             return False
 
-    def update_translation(self, translation_id, english, kurdish):
+    def update_translation(self, translation_id, english, kurdish, googletrans=None):
         try:
+            update_data = {"english": english, "kurdish": kurdish}
+            if googletrans is not None:
+                update_data["googletrans"] = googletrans
+
             object_id = ObjectId(translation_id)
             result = self.collection.update_one(
                 {"_id": object_id},
-                {"$set": {"english": english, "kurdish": kurdish}}
+                {"$set": update_data}
             )
             return result.modified_count > 0
         except Exception as e:

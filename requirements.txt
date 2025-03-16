@@ -1,4 +1,5 @@
 CherryPy==18.10.0
+googletrans==4.0.2
 Jinja2==3.1.6
 polib==1.2.0
 pymongo==4.11.2
